@@ -61,7 +61,21 @@ class Lidar_Reader():
                 'P11 Dist',
                 'P12 Dist']].to_numpy())
         
+        intensities = pd.Series(packet[['P1 Intensity',
+                'P2 Intensity',
+                'P3 Intensity',
+                'P4 Intensity',
+                'P5 Intensity',
+                'P6 Intensity',
+                'P7 Intensity',
+                'P8 Intensity',
+                'P9 Intensity',
+                'P10 Intensity',
+                'P11 Intensity',
+                'P12 Intensity']].to_numpy())
+        
         points['Distance (mm)'] = dist
+        points['Intensity'] = intensities
 
         start_angle = float(packet['Start Angle']) / 100
         end_angle = float(packet['End Angle']) / 100
