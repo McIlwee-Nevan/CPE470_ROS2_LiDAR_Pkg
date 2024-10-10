@@ -4,6 +4,7 @@ from rclpy.node import Node
 from sensor_msgs.msg import LaserScan
 
 from lidar_data import Lidar_Reader
+import numpy as np
 
 
 class LidarPublisher(Node):
@@ -21,12 +22,33 @@ class LidarPublisher(Node):
         return packet
 
     def publish_scan(self):
-        scan_time = self.time
         self.time = self.get_clock().now()
-        scan_time = self.time - scan_time
         packet = self.get_scan()
+        points = self.reader.get_points_from_packet(packet)
+        angles = points['Angle'].to_numpy()
+        angles = angles * -1
+        angles = angles % 360
+        angle_min = angles[0]
+        angle_max = angles[11]
+        angle_range = (angle_max - angle_min) % 360
+        angle_increment = angle_range / len(angles)
+        time_increment = angle_increment / packet['Speed']
+
         msg = LaserScan()
         msg.header.stamp = self.time
+        msg.angle_min = np.deg2rad(angle_min)
+        msg.angle_max = np.deg2rad(angle_max)
+        msg.angle_increment = np.deg2rad(angle_increment)
+        msg.time_increment = time_increment
+        msg.range_min = 0
+        msg.range_max = 1000
+        msg.ranges = points['Distance (mm)'].to_numpy()
+        msg.intensities = points['Intensity'].to_numpy()
+
+        self.publisher_.publish(msg)
+
+
+
 
 
 def main(args=None):
@@ -37,7 +59,7 @@ def main(args=None):
 
     try:
         while rclpy.ok():
-            publisher.run()
+            publisher.publish_scan()
     except KeyboardInterrupt:
         "Shutting down user integer node..."
 
