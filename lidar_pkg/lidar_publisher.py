@@ -3,7 +3,7 @@ from rclpy.node import Node
 
 from sensor_msgs.msg import LaserScan
 
-from lidar_data import Lidar_Reader
+from .lidar_data import Lidar_Reader
 import numpy as np
 
 
