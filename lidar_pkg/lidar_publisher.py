@@ -42,6 +42,7 @@ class LidarPublisher(Node):
         msg.time_increment = time_increment
         ranges = points['Distance (mm)'].to_numpy()
         ranges = ranges.astype(np.float32)
+        ranges = ranges / 1000
         msg.ranges = ranges
         msg.range_min = ranges.min()
         msg.range_max = ranges.max()
