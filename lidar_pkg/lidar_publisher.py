@@ -43,13 +43,13 @@ class LidarPublisher(Node):
         ranges = points['Distance (mm)'].to_numpy()
         ranges = ranges.astype(np.float32)
         ranges = ranges / 1000
-        msg.ranges = ranges
+        msg.ranges = ranges.tolist()
         msg.range_min = ranges.min()
         msg.range_max = ranges.max()
 
         intensities = points['Intensity'].to_numpy()
         intensities = intensities.astype(np.float32)
-        msg.intensities = intensities
+        msg.intensities = intensities.tolist()
 
         self.publisher_.publish(msg)
 
