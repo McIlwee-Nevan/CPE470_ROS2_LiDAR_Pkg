@@ -35,7 +35,7 @@ class LidarPublisher(Node):
         time_increment = angle_increment / packet['Speed']
 
         msg = LaserScan()
-        msg.header.stamp = self.time
+        msg.header.stamp = self.time.to_msg()
         msg.angle_min = np.deg2rad(angle_min)
         msg.angle_max = np.deg2rad(angle_max)
         msg.angle_increment = np.deg2rad(angle_increment)
