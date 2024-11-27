@@ -101,7 +101,7 @@ class Lidar_Reader():
             current_time = packet['Timestamp']
             
             temp = self.get_points_from_packet(packet)
-            points = points._append(temp, ignore_index=True)
+            points = points.append(temp, ignore_index=True)
 
         return points
 
