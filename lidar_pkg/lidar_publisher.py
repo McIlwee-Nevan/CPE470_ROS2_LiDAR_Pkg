@@ -27,9 +27,9 @@ class LidarPublisher(Node):
         points = self.reader.get_points_from_packet(packet)
         angles = points['Angle'].to_numpy()
         angles = angles * -1
-        angles = angles % 360
-        angle_min = angles[0]
-        angle_max = angles[11]
+        angles = angles + 360
+        angle_min = angles[11]
+        angle_max = angles[0]
         angle_range = (angle_max - angle_min) % 360
         angle_increment = angle_range / len(angles)
         time_increment = angle_increment / packet['Speed']
@@ -43,12 +43,14 @@ class LidarPublisher(Node):
         ranges = points['Distance (mm)'].to_numpy()
         ranges = ranges.astype(np.float32)
         ranges = ranges / 1000
+        ranges = np.flip(ranges)
         msg.ranges = ranges.tolist()
         msg.range_min = 0.0
         msg.range_max = 100.0
 
         intensities = points['Intensity'].to_numpy()
         intensities = intensities.astype(np.float32)
+        intensities = np.flip(intensities)
         msg.intensities = intensities.tolist()
 
         self.publisher_.publish(msg)
