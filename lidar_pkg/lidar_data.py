@@ -119,7 +119,9 @@ def main():
         print(reader.get_packet())
 
     points = reader.get_points(0.025)
-    print(points)
+    ranges = points['Distance (mm)'].to_numpy()
+    ranges = ranges.astype(np.float32)
+    print(ranges)
 
         
 
