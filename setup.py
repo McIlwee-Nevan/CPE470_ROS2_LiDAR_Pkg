@@ -21,6 +21,7 @@ setup(
     entry_points={
         'console_scripts': [
             'publish_lidar = lidar_pkg.lidar_publisher:main',
+            'sub_lidar = lidar_pkg.find_gap:main',
         ],
     },
 )
