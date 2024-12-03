@@ -29,9 +29,9 @@ class FindGap(Node):
         if max_angle < min_angle:
             max_angle += 2*np.pi
         new_angles = np.linspace(min_angle, max_angle, len(new_ranges))
-        for angle in new_angles:
-            if angle > (2*np.pi):
-                angle -= (2*np.pi)
+        for i in range(len(new_angles)):
+            if new_angles[i] > (2*np.pi):
+                new_angles[i] -= (2*np.pi)
 
         self.ranges.extend(new_ranges)
         self.angles.extend(new_angles)
@@ -56,8 +56,10 @@ class FindGap(Node):
 
 
         #sort polar points by ranges
-        angles = np.array(self.angles)
-        ranges = np.array(self.ranges)
+        angles = np.copy(self.angles)
+        ranges = np.copy(self.ranges)
+        self.ranges = []
+        self.angles = []
         index_array = np.argsort(angles)
         sorted_angles = np.take_along_axis(angles, index_array, 0)
         sorted_ranges = np.take_along_axis(ranges, index_array, 0)
@@ -65,24 +67,33 @@ class FindGap(Node):
         #filter points too far away
         keep = sorted_ranges < 1.5 * np.median(sorted_ranges)
         filtered_angles = sorted_angles[keep]
-        filtered_ranges = sorted_angles[keep]
+        filtered_ranges = sorted_ranges[keep]
         
         #find gap in angle
         ends = []
 
         for i in range(len(filtered_angles)):
-            if abs(filtered_angles[i-1] - filtered_angles[i]) > 2*self.angle_interval:
-                ends = [i-1, i]
+            prev = filtered_angles[i-1]
+            if prev > filtered_angles[i]:
+                prev -= 2*np.pi
+    
+            if abs(prev - filtered_angles[i]) > 2*self.angle_interval:
+                ends = [i-5, (i+5)%len(filtered_angles)]
                 break
+        
+        if not ends:
+            self.get_logger().warn("Could not find gap, trying again...")
+            return
 
         x = filtered_ranges[ends] * np.cos(filtered_angles[ends])
         y = filtered_ranges[ends] * np.sin(filtered_angles[ends])
 
+        self.get_logger().info(f"Angles: ({filtered_angles[ends]})")
+        self.get_logger().info(f"Ranges: ({filtered_ranges[ends]})")
         self.get_logger().info(f"Point 1: {x[0]:.4f}, {y[0]:.4f}")
         self.get_logger().info(f"Point 2: {x[1]:.4f}, {y[1]:.4f}")
 
-        self.ranges = []
-        self.angles = []
+        
 
         
         """ 
