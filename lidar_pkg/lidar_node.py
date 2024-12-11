@@ -3,7 +3,7 @@ from rclpy.node import Node
 
 from sensor_msgs.msg import LaserScan
 from std_msgs.msg import Int16
-
+from lidar_data.msg import LidarData
 
 import copy
 import numpy as np
@@ -22,11 +22,12 @@ class FindGap(Node):
             self.points_callback,
             10
         )
-        '''
         self.publisher_ = self.create_publisher(
-            #Fill in
+            LidarData,
+            '/lidar_data',
+            10
         )
-        '''
+
         #self.timer = self.create_timer(0.1, self.find_gap)
         self.timer = self.create_timer(0.1, self.publish_lidar_data)
         self.ranges = []
@@ -84,9 +85,14 @@ class FindGap(Node):
         """
 
     def publish_lidar_data(self):
+        '''
         self.get_logger().info(f"Nearest Point's Angle: {self.angle_closest:0.3f} Radians")
         self.get_logger().info(f"Distance in Front: {self.dist_in_front:0.3f} Meters")
-        
+        '''
+        msg = LidarData
+        msg.nearest_angle = self.angle_closest
+        msg.range_in_front = self.dist_in_front
+        self.publisher_.publish(msg)
 
     def find_gap(self):
         if self.angle_interval < 0:
