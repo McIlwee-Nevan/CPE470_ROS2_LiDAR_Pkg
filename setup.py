@@ -22,6 +22,7 @@ setup(
         'console_scripts': [
             'publish_lidar = lidar_pkg.lidar_publisher:main',
             'sub_lidar = lidar_pkg.find_gap:main',
+            'lidar_node = lidar_pkg.lidar_node:main',
         ],
     },
 )

@@ -2,14 +2,19 @@ import rclpy
 from rclpy.node import Node
 
 from sensor_msgs.msg import LaserScan
+from std_msgs.msg import Int16
 
+
+import copy
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
+
+
+
 
 
 class FindGap(Node):
-    def __init__(self):
+    def __init__(self, a=-1):
         super().__init__('find_gap')
         self.subscription_ = self.create_subscription(
             LaserScan,
@@ -17,10 +22,22 @@ class FindGap(Node):
             self.points_callback,
             10
         )
-        self.timer = self.create_timer(1, self.find_gap)
+        '''
+        self.publisher_ = self.create_publisher(
+            #Fill in
+        )
+        '''
+        #self.timer = self.create_timer(0.1, self.find_gap)
+        self.timer = self.create_timer(0.1, self.publish_lidar_data)
         self.ranges = []
-        self.angles = []
+        self.angles = []  
+        self.next_ranges = []
+        self.next_angles = []
         self.angle_interval = -1
+
+        self.angle_a = a
+        self.angle_closest = -1
+        self.dist_in_front = -1
 
 
     def points_callback(self, msg: LaserScan):
@@ -34,9 +51,30 @@ class FindGap(Node):
             if new_angles[i] > (2*np.pi):
                 new_angles[i] -= (2*np.pi)
 
-        self.ranges.extend(new_ranges)
-        self.angles.extend(new_angles)
+        self.next_ranges.extend(new_ranges)
+        self.next_angles.extend(new_angles)
         self.angle_interval = msg.angle_increment
+
+        min_num_pts = ((np.pi * 2) / self.angle_interval) * 3
+        if len(self.next_angles) > min_num_pts:
+            self.ranges = np.copy(self.next_ranges)
+            self.angles = np.copy(self.next_angles)
+            self.next_angles.clear()
+            self.next_ranges.clear()
+
+            #Sort
+            index_array = np.argsort(self.angles)
+            self.angles = np.take_along_axis(self.angles, index_array, 0)
+            self.ranges = np.take_along_axis(self.ranges, index_array, 0)
+            
+            #DBSCAN to remove outliers
+            #HERE
+
+            #Update Info
+            self.angle_closest = self.angles[self.ranges.argmin()]
+            self.dist_in_front = self.ranges[0]
+
+            
         
         """ 
         angles = ' '.join([str(s) for s in new_angles])
@@ -44,6 +82,11 @@ class FindGap(Node):
         self.get_logger().info(angles)
         self.get_logger().info(ranges)
         """
+
+    def publish_lidar_data(self):
+        self.get_logger().info(f"Nearest Point's Angle: {self.angle_closest:0.3f} Radians")
+        self.get_logger().info(f"Distance in Front: {self.dist_in_front:0.3f} Meters")
+        
 
     def find_gap(self):
         if self.angle_interval < 0:
@@ -55,29 +98,11 @@ class FindGap(Node):
             self.get_logger().info("Not enough points, waiting 1 second...")
             return
 
-
-        #sort polar points by ranges
-        angles = np.copy(self.angles)
-        ranges = np.copy(self.ranges)
-        self.ranges = []
-        self.angles = []
-        index_array = np.argsort(angles)
-        sorted_angles = np.take_along_axis(angles, index_array, 0)
-        sorted_ranges = np.take_along_axis(ranges, index_array, 0)
         
         #filter points too far away
-        threshold = 1.5 * np.median(sorted_ranges)
-        keep = sorted_ranges < threshold
-        filtered_angles = sorted_angles[keep]
-        filtered_ranges = sorted_ranges[keep]
-
-        '''
-        fig, ax = plt.subplots(subplot_kw={'projection': 'polar'})
-        ax.scatter(filtered_angles, filtered_ranges)
-        ax.set_rmax(threshold)
-        ax.set_title("LiDAR Sensor Data")
-        plt.show()
-        '''
+        keep = self.ranges < (1.5 * np.median(self.ranges))
+        filtered_angles = self.angles[keep]
+        filtered_ranges = self.ranges[keep]
         
         #find gap in angle
         ends = []
