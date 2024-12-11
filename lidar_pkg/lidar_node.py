@@ -89,7 +89,7 @@ class FindGap(Node):
         self.get_logger().info(f"Nearest Point's Angle: {self.angle_closest:0.3f} Radians")
         self.get_logger().info(f"Distance in Front: {self.dist_in_front:0.3f} Meters")
         '''
-        msg = LidarData
+        msg = LidarData()
         msg.nearest_angle = self.angle_closest
         msg.range_in_front = self.dist_in_front
         self.publisher_.publish(msg)
