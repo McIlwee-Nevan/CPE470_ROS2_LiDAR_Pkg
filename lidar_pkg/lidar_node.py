@@ -14,7 +14,7 @@ import pandas as pd
 
 
 class FindGap(Node):
-    def __init__(self, a=-1):
+    def __init__(self, a=-1.0):
         super().__init__('find_gap')
         self.subscription_ = self.create_subscription(
             LaserScan,
@@ -34,11 +34,11 @@ class FindGap(Node):
         self.angles = []  
         self.next_ranges = []
         self.next_angles = []
-        self.angle_interval = -1
+        self.angle_interval = -1.0
 
         self.angle_a = a
-        self.angle_closest = -1
-        self.dist_in_front = -1
+        self.angle_closest = -1.0
+        self.dist_in_front = -1.0
 
 
     def points_callback(self, msg: LaserScan):
@@ -46,7 +46,7 @@ class FindGap(Node):
         min_angle = msg.angle_min
         max_angle = msg.angle_max
         if max_angle < min_angle:
-            max_angle += 2*np.pi
+            max_angle += 2.0*np.pi
         new_angles = np.linspace(min_angle, max_angle, len(new_ranges))
         for i in range(len(new_angles)):
             if new_angles[i] > (2*np.pi):
