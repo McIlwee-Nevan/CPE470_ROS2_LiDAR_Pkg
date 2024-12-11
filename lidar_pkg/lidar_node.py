@@ -37,7 +37,8 @@ class FindGap(Node):
         self.angle_interval = -1.0
 
         self.angle_a = a
-        self.angle_closest = -1.0
+        self.nearest_angle = -1.0
+        self.nearest_range = -1.0
         self.dist_in_front = -1.0
 
 
@@ -72,7 +73,8 @@ class FindGap(Node):
             #HERE
 
             #Update Info
-            self.angle_closest = self.angles[self.ranges.argmin()]
+            self.nearest_range = self.ranges.min()
+            self.nearest_angle = self.angles[self.ranges.argmin()]
             self.dist_in_front = self.ranges[0]
 
             
@@ -90,7 +92,8 @@ class FindGap(Node):
         self.get_logger().info(f"Distance in Front: {self.dist_in_front:0.3f} Meters")
         '''
         msg = LidarData()
-        msg.nearest_angle = self.angle_closest
+        msg.nearest_angle = self.nearest_angle
+        msg.nearest_range = self.nearest_range
         msg.range_in_front = self.dist_in_front
         self.publisher_.publish(msg)
 
