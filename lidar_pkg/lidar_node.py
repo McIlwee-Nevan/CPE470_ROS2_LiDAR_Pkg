@@ -150,7 +150,7 @@ class FindGap(Node):
         angle_ab = (self.corner_angles[1]-self.corner_angles[0])
         angle_ab = angle_ab if (angle_ab >= 0) else (angle_ab + (2*np.pi))
         alpha = np.arcsin((self.corner_ranges[1] * np.sin(angle_ab))/1.15)
-        theta = 180.0 - self.corner_angles[0] + alpha
+        theta = np.pi - self.corner_angles[0] + alpha
         theta = theta if (theta >= 0) else (theta + (2*np.pi))
 
         self.x = self.corner_ranges[0] * np.cos(alpha)
