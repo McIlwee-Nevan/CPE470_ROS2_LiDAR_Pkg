@@ -22,6 +22,10 @@ class FindGap(Node):
         self.angles = []
         self.angle_interval = -1
 
+        plt.ion()
+        self.fig, self.ax = plt.subplots(subplot_kw={'projection': 'polar'})
+        plt.show()
+
 
     def points_callback(self, msg: LaserScan):
         new_ranges = msg.ranges
@@ -71,13 +75,13 @@ class FindGap(Node):
         filtered_angles = sorted_angles[keep]
         filtered_ranges = sorted_ranges[keep]
 
-        '''
-        fig, ax = plt.subplots(subplot_kw={'projection': 'polar'})
-        ax.scatter(filtered_angles, filtered_ranges)
-        ax.set_rmax(threshold)
-        ax.set_title("LiDAR Sensor Data")
-        plt.show()
-        '''
+        self.ax.clear()
+        self.ax.scatter(filtered_angles, filtered_ranges)
+        self.ax.set_rmax(threshold)
+        self.ax.set_title("LiDAR Sensor Data")
+        plt.draw()
+        plt.pause(0.001)
+        
         
         #find gap in angle
         ends = []
