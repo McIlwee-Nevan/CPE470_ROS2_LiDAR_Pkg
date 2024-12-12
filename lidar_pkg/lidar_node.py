@@ -67,11 +67,11 @@ class FindGap(Node):
     def enable_localization(self, msg: Bool):
         self.localization = msg.data
         if not self.localization:
-            self.corner_angles.fill(-1)
-            self.corner_ranges.fill(-1)
-            self.x = -1
-            self.y = -1
-            self.theta = -1
+            self.corner_angles.fill(-1.0)
+            self.corner_ranges.fill(-1.0)
+            self.x = -1.0
+            self.y = -1.0
+            self.theta = -1.0
     
     def points_callback(self, msg: LaserScan):
         new_ranges = msg.ranges
