@@ -14,7 +14,6 @@
   <exec_depend>python3-serial</exec_depend>
   <exec_depend>python3-sklearn</exec_depend>
   <exec_depend>python3-sklearn-lib</exec_depend>
-  <exec_depend>python3-sklearn-doc</exec_depend>
   <exec_depend>python3-numpy</exec_depend>
   <exec_depend>python3-pandas</exec_depend>
   <exec_depend>rclpy</exec_depend>
